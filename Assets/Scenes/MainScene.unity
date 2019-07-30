@@ -235,6 +235,7 @@ MonoBehaviour:
   tilePrefab: {fileID: 2858679373822771705, guid: 9a211cc3f873d674c83d6ec28388a18c,
     type: 3}
   mapSize: 10
+  bombChance: 0.1
 --- !u!4 &999043880
 Transform:
   m_ObjectHideFlags: 0

@@ -1,20 +1,26 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class Tile : MonoBehaviour
 {
+    public TileMap map;
+
     public Vector2Int tileCoords; // Position på spelbrädet i Q-R koordinater
 
-    public Image baseImage;     // Fyllningen
-    public Image outlineImage;  // Outlinen
-
+    public TextMeshPro text;       // Texten på tilen
+    public SpriteRenderer baseImage;     // Fyllningen
+    public SpriteRenderer outlineImage;  // Outlinen
+    
     public Color hoverColor;    // Färgen när musen är över oss
-
+    
     public bool isBomb;  // Är vi en bomb?
     public bool hasFlag; // Har spelaren satt en flagga på oss
+    public bool isRevealed; // Har vi klickat på tilen
+
+    public int neighbourBombCount; // Hur många bomber det finns runt oss
 
     Color baseColor;    // Egentliga färg
 
@@ -24,14 +30,37 @@ public class Tile : MonoBehaviour
         baseColor = baseImage.color;    // Spara våran egentliga färg så vi kan ta tbx den senare
     }
 
+    void Update()
+    {
+        text.enabled = !isBomb && isRevealed && neighbourBombCount > 0;
+        text.SetText(isBomb ? "B" : neighbourBombCount.ToString());
+    }
+
     /// <summary>
     /// Körs när spelarens mus kommer över oss eller lämnar oss
     /// </summary>
     /// <param name="hovering">Är spelarens mus över oss just nu?</param>
     public void SetHoverState(bool hovering)
     {
-        outlineImage.enabled = hovering;
-        baseImage.color = hovering ? hoverColor : baseColor;
+        outlineImage.enabled = hovering && !isRevealed;
+        baseImage.color = hovering || isRevealed ? hoverColor : baseColor;
+    }
+
+    /// <summary>
+    /// Revealar våran tile
+    /// </summary>
+    public void RevealTile(bool recurse = false)
+    {
+        if (isRevealed) return;
+        isRevealed = true;
+        SetHoverState(false);
+        if (recurse)
+        {
+            foreach (var tile in map.GetNeighbours(tileCoords))
+            {
+                if (tile.neighbourBombCount == 0) tile.RevealTile(true);
+            }
+        }
     }
 
     /// <summary>
@@ -45,5 +74,6 @@ public class Tile : MonoBehaviour
         var x = Mathf.Sqrt(3) * q + (Mathf.Sqrt(3) / 2) * r;
         var y = 1.5f * r;
         transform.position = new Vector2(x, y) * 0.5f;
+        tileCoords = new Vector2Int(q, r);
     }
 }
