@@ -4,14 +4,14 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class GameOverUI : MonoBehaviour
+public class WinUI : MonoBehaviour
 {
     public Image background;
     public CanvasGroup container;
 
     private void Start()
     {
-        GameController.OnGameOver += OnGameOver;
+        GameController.OnWin += OnGameOver;
         gameObject.SetActive(false);
         background.color = Color.clear;
         container.transform.position = GetComponentInParent<Canvas>().pixelRect.width * Vector3.right * 0.5f;
@@ -20,7 +20,7 @@ public class GameOverUI : MonoBehaviour
 
     private void OnDestroy()
     {
-        GameController.OnGameOver -= OnGameOver;
+        GameController.OnWin -= OnGameOver;
     }
 
     void OnGameOver()

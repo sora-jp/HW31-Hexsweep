@@ -13,6 +13,7 @@ public class Tile : MonoBehaviour
     public TextMeshPro text;       // Texten på tilen
     public SpriteRenderer baseImage;     // Fyllningen
     public SpriteRenderer outlineImage;  // Outlinen
+    public Transform flagMarker;
     
     public Color hoverColor;    // Färgen när musen är över oss
     
@@ -26,7 +27,7 @@ public class Tile : MonoBehaviour
 
     void Start()
     {
-        outlineImage.enabled = false;   // Ingen outline när spelet startar
+        outlineImage.transform.localScale = Vector3.one * 0.85f;   // Ingen outline när spelet startar
         baseColor = baseImage.color;    // Spara våran egentliga färg så vi kan ta tbx den senare
     }
 
@@ -40,18 +41,32 @@ public class Tile : MonoBehaviour
     /// Körs när spelarens mus kommer över oss eller lämnar oss
     /// </summary>
     /// <param name="hovering">Är spelarens mus över oss just nu?</param>
-    public void SetHoverState(bool hovering)
+    public void SetHoverState(bool hovering, bool animateBase = true)
     {
         if (isRevealed) return;
-        outlineImage.enabled = hovering && !isRevealed;
-        baseImage.color = hovering || isRevealed ? hoverColor : baseColor;
+        outlineImage.transform.AnimateScale(hovering ? Vector3.one * 1.1f : Vector3.one * 0.85f, hovering ? 0.15f : 0.1f);
+        if (animateBase) baseImage.AnimateColor(hovering ? hoverColor : baseColor, 0.1f);
+    }
+
+    public void ToggleFlagState()
+    {
+        hasFlag = !hasFlag;
+        float dur = 0.25f;
+        if (hasFlag)
+        {
+            flagMarker.AnimateScale(Vector3.one * 0.45f, dur);
+        }
+        else
+        {
+            flagMarker.AnimateScale(Vector3.zero, dur);
+        }
     }
 
     public void SetTileRevealed()
     {
-        SetHoverState(false);
+        SetHoverState(false, false);
         outlineImage.enabled = false;
-        baseImage.color = isBomb ? Color.red : hoverColor;
+        baseImage.AnimateColor(isBomb ? Color.red : hoverColor, 0.15f);
         isRevealed = true;
     }
 
@@ -67,12 +82,19 @@ public class Tile : MonoBehaviour
             return;
         }
         SetTileRevealed();
+
         if (recurse && neighbourBombCount == 0)
         {
-            foreach (var tile in map.GetNeighbours(tileCoords))
-            {
-                tile.RevealTile(true);
-            }
+            StartCoroutine(_RevealNeighbours());
+        }
+    }
+
+    IEnumerator _RevealNeighbours()
+    {
+        yield return new WaitForSeconds(0.1f);
+        foreach (var tile in map.GetNeighbours(tileCoords))
+        {
+            tile.RevealTile(true);
         }
     }
 

@@ -1,7 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class TileMap : MonoBehaviour
 {
@@ -14,11 +16,14 @@ public class TileMap : MonoBehaviour
     Dictionary<Vector2Int, Tile> tileMap = new Dictionary<Vector2Int, Tile>();
 
     int totalNumBombs;
+    int totalNumFlags;
+    int totalNumFlaggedBombs;
     bool updateTiles = true;
 
     void Start()
     {
-        GameController.OnGameOver += OnGameOver;
+        GameController.OnGameOver += RevealBombsAndDisable;
+        GameController.OnWin += RevealBombsAndDisable;
 
         for (int i = -mapSize + 1; i < mapSize; i++)
         {
@@ -46,7 +51,13 @@ public class TileMap : MonoBehaviour
         }
     }
 
-    void OnGameOver()
+    private void OnDestroy()
+    {
+        GameController.OnGameOver -= RevealBombsAndDisable;
+        GameController.OnWin += RevealBombsAndDisable;
+    }
+
+    void RevealBombsAndDisable()
     {
         updateTiles = false;
         foreach (var tile in tileMap.Select(kvp => kvp.Value))
@@ -73,7 +84,21 @@ public class TileMap : MonoBehaviour
         {
             currentHoverTile.RevealTile(true, true);
         }
+        if (Input.GetMouseButtonDown(1) && currentHoverTile != null)
+        {
+            currentHoverTile.ToggleFlagState();
+            UpdateFlagParams();
+        }
     }
+
+    void UpdateFlagParams()
+    {
+        totalNumFlags = TilesWhere(t => t.hasFlag).Count();
+        totalNumFlaggedBombs = TilesWhere(t => t.hasFlag && t.isBomb).Count();
+        if (totalNumBombs == totalNumFlaggedBombs && totalNumBombs == totalNumFlags) GameController.Instance.PlayerWinYeet();
+    }
+
+    private IEnumerable<Tile> TilesWhere(System.Func<Tile, bool> pred) => tileMap.Select(t => t.Value).Where(pred);
 
     public IEnumerable<Tile> GetNeighbours(Vector2Int coord)
     {
@@ -95,7 +120,11 @@ public class TileMap : MonoBehaviour
     void SpawnTile(int q, int r)
     {
         Tile newTile = Instantiate(tilePrefab);
-        if (Random.value < bombChance) newTile.isBomb = true;
+        if (Random.value < bombChance)
+        {
+            totalNumBombs++;
+            newTile.isBomb = true;
+        }
         newTile.map = this;
         newTile.SetPosition(q, r);
         tileMap[newTile.tileCoords] = newTile;
