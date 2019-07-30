@@ -417,7 +417,7 @@ MonoBehaviour:
   outlineImage: {fileID: 3950810779662042999}
   flagMarker: {fileID: 2958989024377495568}
   hoverColor: {r: 0.9, g: 0.9, b: 0.9, a: 1}
-  revealColor: {r: 0.85, g: 0.85, b: 0.85, a: 1}
+  revealColor: {r: 0.7305091, g: 0.8955868, b: 0.9056604, a: 1}
   revealBombColor: {r: 0.7264151, g: 0.3529281, b: 0.3529281, a: 1}
   isBomb: 0
   hasFlag: 0

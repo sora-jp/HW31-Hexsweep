@@ -50,6 +50,7 @@ public class Tile : MonoBehaviour
 
     public void ToggleFlagState()
     {
+        if (isRevealed) return;
         hasFlag = !hasFlag;
         float dur = 0.25f;
         if (hasFlag)
