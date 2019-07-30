@@ -25,7 +25,6 @@ public class GameController : MonoBehaviour
 
     public void PlayerClickBombYeet()
     {
-        Debug.Log("u ded");
         OnGameOver?.Invoke();
     }
 

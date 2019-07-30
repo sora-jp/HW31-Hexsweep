@@ -15,7 +15,7 @@ public class Tile : MonoBehaviour
     public SpriteRenderer outlineImage;  // Outlinen
     public Transform flagMarker;
     
-    public Color hoverColor;    // Färgen när musen är över oss
+    public Color hoverColor, revealColor, revealBombColor;    // Färgen när musen är över oss
     
     public bool isBomb;  // Är vi en bomb?
     public bool hasFlag; // Har spelaren satt en flagga på oss
@@ -44,7 +44,7 @@ public class Tile : MonoBehaviour
     public void SetHoverState(bool hovering, bool animateBase = true)
     {
         if (isRevealed) return;
-        outlineImage.transform.AnimateScale(hovering ? Vector3.one * 1.1f : Vector3.one * 0.85f, hovering ? 0.15f : 0.1f);
+        outlineImage?.transform?.AnimateScale(hovering ? Vector3.one * 1.1f : Vector3.one * 0.85f, hovering ? 0.15f : 0.1f);
         if (animateBase) baseImage.AnimateColor(hovering ? hoverColor : baseColor, 0.1f);
     }
 
@@ -66,7 +66,7 @@ public class Tile : MonoBehaviour
     {
         SetHoverState(false, false);
         outlineImage.enabled = false;
-        baseImage.AnimateColor(isBomb ? Color.red : hoverColor, 0.15f);
+        baseImage.AnimateColor(isBomb ? revealBombColor : revealColor, isBomb ? 0.5f : 0.15f);
         isRevealed = true;
     }
 
@@ -75,7 +75,7 @@ public class Tile : MonoBehaviour
     /// </summary>
     public void RevealTile(bool recurse = false, bool triggeredByClick = false)
     {
-        if (isRevealed) return;
+        if (isRevealed || (hasFlag && triggeredByClick)) return;
         if (isBomb && triggeredByClick)
         {
             GameController.Instance.PlayerClickBombYeet();
@@ -94,7 +94,7 @@ public class Tile : MonoBehaviour
         yield return new WaitForSeconds(0.1f);
         foreach (var tile in map.GetNeighbours(tileCoords))
         {
-            tile.RevealTile(true);
+            tile.RevealTile(true, true);
         }
     }
 

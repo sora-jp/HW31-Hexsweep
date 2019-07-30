@@ -54,7 +54,7 @@ public class TileMap : MonoBehaviour
     private void OnDestroy()
     {
         GameController.OnGameOver -= RevealBombsAndDisable;
-        GameController.OnWin += RevealBombsAndDisable;
+        GameController.OnWin -= RevealBombsAndDisable;
     }
 
     void RevealBombsAndDisable()
@@ -84,7 +84,7 @@ public class TileMap : MonoBehaviour
         {
             currentHoverTile.RevealTile(true, true);
         }
-        if (Input.GetMouseButtonDown(1) && currentHoverTile != null)
+        if (Input.GetMouseButtonDown(1) && currentHoverTile != null && (totalNumFlags < totalNumBombs || currentHoverTile.hasFlag))
         {
             currentHoverTile.ToggleFlagState();
             UpdateFlagParams();
