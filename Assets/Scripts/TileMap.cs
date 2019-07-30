@@ -25,6 +25,7 @@ public class TileMap : MonoBehaviour
         GameController.OnGameOver += RevealBombsAndDisable;
         GameController.OnWin += RevealBombsAndDisable;
 
+        // TODO: Poisson disc sampling? with a random size per disc ofc
         for (int i = -mapSize + 1; i < mapSize; i++)
         {
             for (int j = -mapSize + 1; j < mapSize; j++)
