@@ -14,9 +14,12 @@ public class TileMap : MonoBehaviour
     Dictionary<Vector2Int, Tile> tileMap = new Dictionary<Vector2Int, Tile>();
 
     int totalNumBombs;
+    bool updateTiles = true;
 
     void Start()
     {
+        GameController.OnGameOver += OnGameOver;
+
         for (int i = -mapSize + 1; i < mapSize; i++)
         {
             for (int j = -mapSize + 1; j < mapSize; j++)
@@ -43,8 +46,20 @@ public class TileMap : MonoBehaviour
         }
     }
 
+    void OnGameOver()
+    {
+        updateTiles = false;
+        foreach (var tile in tileMap.Select(kvp => kvp.Value))
+        {
+            tile.SetHoverState(false);
+            if (tile.isBomb)
+                tile.RevealTile();
+        }
+    }
+
     void Update()
     {
+        if (!updateTiles) return;
         Vector2 mouseCoords = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         var x = Mathf.RoundToInt((Mathf.Sqrt(3) / 3 * mouseCoords.x - 1.0f / 3 * mouseCoords.y) * 2);
         var y = Mathf.RoundToInt((2.0f / 3 * mouseCoords.y) * 2);
@@ -56,7 +71,7 @@ public class TileMap : MonoBehaviour
         }
         if (Input.GetMouseButtonDown(0) && currentHoverTile != null)
         {
-            currentHoverTile.RevealTile(true);
+            currentHoverTile.RevealTile(true, true);
         }
     }
 

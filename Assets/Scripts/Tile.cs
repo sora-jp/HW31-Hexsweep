@@ -42,23 +42,36 @@ public class Tile : MonoBehaviour
     /// <param name="hovering">Är spelarens mus över oss just nu?</param>
     public void SetHoverState(bool hovering)
     {
+        if (isRevealed) return;
         outlineImage.enabled = hovering && !isRevealed;
         baseImage.color = hovering || isRevealed ? hoverColor : baseColor;
+    }
+
+    public void SetTileRevealed()
+    {
+        SetHoverState(false);
+        outlineImage.enabled = false;
+        baseImage.color = isBomb ? Color.red : hoverColor;
+        isRevealed = true;
     }
 
     /// <summary>
     /// Revealar våran tile
     /// </summary>
-    public void RevealTile(bool recurse = false)
+    public void RevealTile(bool recurse = false, bool triggeredByClick = false)
     {
         if (isRevealed) return;
-        isRevealed = true;
-        SetHoverState(false);
-        if (recurse)
+        if (isBomb && triggeredByClick)
+        {
+            GameController.Instance.PlayerClickBombYeet();
+            return;
+        }
+        SetTileRevealed();
+        if (recurse && neighbourBombCount == 0)
         {
             foreach (var tile in map.GetNeighbours(tileCoords))
             {
-                if (tile.neighbourBombCount == 0) tile.RevealTile(true);
+                tile.RevealTile(true);
             }
         }
     }
