@@ -43,8 +43,8 @@ public class Tile : MonoBehaviour
     /// <param name="hovering">Är spelarens mus över oss just nu?</param>
     public void SetHoverState(bool hovering, bool animateBase = true)
     {
+        outlineImage?.transform?.AnimateScale(hovering ? Vector3.one * 2f : Vector3.one * 0.85f, hovering ? 0.15f : 0.1f);
         if (isRevealed) return;
-        outlineImage?.transform?.AnimateScale(hovering ? Vector3.one * 1.1f : Vector3.one * 0.85f, hovering ? 0.15f : 0.1f);
         if (animateBase) baseImage.AnimateColor(hovering ? hoverColor : baseColor, 0.1f);
     }
 
@@ -65,8 +65,8 @@ public class Tile : MonoBehaviour
 
     public void SetTileRevealed()
     {
-        SetHoverState(false, false);
-        outlineImage.enabled = false;
+        //SetHoverState(false, false);
+        //outlineImage.enabled = false;
         baseImage.AnimateColor(isBomb ? revealBombColor : revealColor, isBomb ? 0.5f : 0.15f);
         isRevealed = true;
     }
@@ -92,9 +92,9 @@ public class Tile : MonoBehaviour
 
     IEnumerator _RevealNeighbours()
     {
-        yield return new WaitForSeconds(0.1f);
         foreach (var tile in map.GetNeighbours(tileCoords))
         {
+            yield return new WaitForSeconds(0.035f);
             tile.RevealTile(true, true);
         }
     }
