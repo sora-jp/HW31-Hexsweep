@@ -10,6 +10,11 @@ public class WinUI : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+    void OnDestroy()
+    {
+        GameController.OnWin -= OnWin;
+    }
+
     void OnWin()
     {
         gameObject.SetActive(true);

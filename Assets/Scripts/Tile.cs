@@ -27,7 +27,7 @@ public class Tile : MonoBehaviour
 
     void Start()
     {
-        outlineImage.enabled = false;   // Ingen outline när spelet startar
+        outlineImage.transform.localScale = Vector3.one * 0.85f;
         baseColor = baseImage.color;    // Spara våran egentliga färg så vi kan ta tbx den senare
     }
 
@@ -44,15 +44,15 @@ public class Tile : MonoBehaviour
     public void SetHoverState(bool hovering)
     {
         if (isRevealed) return;
-        outlineImage.enabled = hovering && !isRevealed;
-        baseImage.color = hovering || isRevealed ? hoverColor : baseColor;
+        outlineImage.transform.AnimateScale(Vector3.one * (hovering ? 1.1f : 0.85f), 0.05f);
+        baseImage.AnimateColor(hovering ? hoverColor : baseColor, 0.1f);
     }
 
     public void SetTileRevealed()
     {
         SetHoverState(false);
         outlineImage.enabled = false;
-        baseImage.color = isBomb ? Color.red : hoverColor;
+        baseImage.AnimateColor(isBomb ? Color.red : hoverColor, isBomb ? 0.5f : 0.1f);
         isRevealed = true;
     }
 
@@ -71,10 +71,16 @@ public class Tile : MonoBehaviour
         SetTileRevealed();
         if (recurse && neighbourBombCount == 0)
         {
-            foreach (var tile in map.GetNeighbours(tileCoords))
-            {
-                tile.RevealTile(true, triggeredByClick);
-            }
+            StartCoroutine(RevealDelayed(triggeredByClick));
+        }
+    }
+
+    IEnumerator RevealDelayed(bool triggeredByClick)
+    {
+        foreach (var tile in map.GetNeighbours(tileCoords))
+        {
+            yield return new WaitForSeconds(0.035f);
+            tile.RevealTile(true, triggeredByClick);
         }
     }
 

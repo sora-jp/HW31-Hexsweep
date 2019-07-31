@@ -20,7 +20,8 @@ public class TileMap : MonoBehaviour
 
     void Start()
     {
-        GameController.OnGameOver += OnGameOver;
+        GameController.OnGameOver += DisableTilemap;
+        GameController.OnWin += DisableTilemap;
 
         for (int i = -mapSize + 1; i < mapSize; i++)
         {
@@ -48,7 +49,13 @@ public class TileMap : MonoBehaviour
         }
     }
 
-    void OnGameOver()
+    void OnDestroy()
+    {
+        GameController.OnGameOver -= DisableTilemap;
+        GameController.OnWin -= DisableTilemap;
+    }
+
+    void DisableTilemap()
     {
         updateTiles = false;
         foreach (var tile in tileMap.Select(kvp => kvp.Value))

@@ -10,6 +10,11 @@ public class GameOverUI : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+    void OnDestroy()
+    {
+        GameController.OnGameOver -= OnGameOver;
+    }
+
     void OnGameOver()
     {
         gameObject.SetActive(true);
