@@ -54,6 +54,8 @@ public static class Animations
         container.StartAnimation(_Animate(duration, start, end, lerper, setter, endEvt), id);
     }
 
+    static float ease(float x, float a) => Mathf.Pow(x, a) / (Mathf.Pow(x, a) + Mathf.Pow(1 - x, a));
+
     static IEnumerator _Animate<T>(float duration, T start, T end, Func<T, T, float, T> lerper, Action<T> setter, Action endEvt)
     {
         float t = 0;
@@ -61,7 +63,7 @@ public static class Animations
         while (t < 1)
         {
             t += Time.deltaTime / duration;
-            setter(lerper(start, end, t));
+            setter(lerper(start, end, ease(t, 3)));
             yield return null;
         }
         setter(end);

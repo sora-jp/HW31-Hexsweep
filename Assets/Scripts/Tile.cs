@@ -44,8 +44,8 @@ public class Tile : MonoBehaviour
     public void SetHoverState(bool hovering)
     {
         if (isRevealed) return;
-        outlineImage.transform.AnimateScale(Vector3.one * (hovering ? 1.1f : 0.85f), 0.05f);
-        baseImage.AnimateColor(hovering ? hoverColor : baseColor, 0.1f);
+        outlineImage.transform.AnimateScale(Vector3.one * (hovering ? 1.1f : 0.85f), 0.08f);
+        baseImage.AnimateColor(hovering ? hoverColor : baseColor, 0.13f);
     }
 
     public void SetTileRevealed()
