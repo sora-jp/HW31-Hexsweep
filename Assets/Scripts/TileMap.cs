@@ -77,7 +77,10 @@ public class TileMap : MonoBehaviour
         }
         if (Input.GetMouseButtonDown(1) && currentHoverTile != null)
         {
-            currentHoverTile.ToggleFlagState();
+            if (totalNumFlags < totalNumBombs || currentHoverTile.hasFlag)
+                currentHoverTile.ToggleFlagState();
+
+            UpdateFlagStates();
         }
     }
 
@@ -85,6 +88,8 @@ public class TileMap : MonoBehaviour
     {
         totalNumFlaggedBombs = TilesWhereCount(t => t.hasFlag && t.isBomb);
         totalNumFlags = TilesWhereCount(t => t.hasFlag);
+        if (totalNumBombs == totalNumFlags && totalNumBombs == totalNumFlaggedBombs)
+            GameController.Instance.PlayerWinYeet();
     }
 
     int TilesWhereCount(System.Func<Tile, bool> pred)
