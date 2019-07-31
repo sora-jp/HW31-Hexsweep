@@ -14,6 +14,8 @@ public class TileMap : MonoBehaviour
     Dictionary<Vector2Int, Tile> tileMap = new Dictionary<Vector2Int, Tile>();
 
     int totalNumBombs;
+    int totalNumFlaggedBombs;
+    int totalNumFlags;
     bool updateTiles = true;
 
     void Start()
@@ -73,6 +75,21 @@ public class TileMap : MonoBehaviour
         {
             currentHoverTile.RevealTile(true, true);
         }
+        if (Input.GetMouseButtonDown(1) && currentHoverTile != null)
+        {
+            currentHoverTile.ToggleFlagState();
+        }
+    }
+
+    void UpdateFlagStates()
+    {
+        totalNumFlaggedBombs = TilesWhereCount(t => t.hasFlag && t.isBomb);
+        totalNumFlags = TilesWhereCount(t => t.hasFlag);
+    }
+
+    int TilesWhereCount(System.Func<Tile, bool> pred)
+    {
+        return tileMap.Select(t => t.Value).Where(pred).Count();
     }
 
     public IEnumerable<Tile> GetNeighbours(Vector2Int coord)
@@ -95,7 +112,11 @@ public class TileMap : MonoBehaviour
     void SpawnTile(int q, int r)
     {
         Tile newTile = Instantiate(tilePrefab);
-        if (Random.value < bombChance) newTile.isBomb = true;
+        if (Random.value < bombChance)
+        {
+            totalNumBombs++;
+            newTile.isBomb = true;
+        }
         newTile.map = this;
         newTile.SetPosition(q, r);
         tileMap[newTile.tileCoords] = newTile;

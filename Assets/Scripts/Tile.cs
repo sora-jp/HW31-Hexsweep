@@ -13,6 +13,7 @@ public class Tile : MonoBehaviour
     public TextMeshPro text;       // Texten på tilen
     public SpriteRenderer baseImage;     // Fyllningen
     public SpriteRenderer outlineImage;  // Outlinen
+    public SpriteRenderer flagMarker;    // Markör om vi har en flagga på oss
     
     public Color hoverColor;    // Färgen när musen är över oss
     
@@ -61,6 +62,7 @@ public class Tile : MonoBehaviour
     public void RevealTile(bool recurse = false, bool triggeredByClick = false)
     {
         if (isRevealed) return;
+        if (hasFlag && triggeredByClick) return;
         if (isBomb && triggeredByClick)
         {
             GameController.Instance.PlayerClickBombYeet();
@@ -71,8 +73,23 @@ public class Tile : MonoBehaviour
         {
             foreach (var tile in map.GetNeighbours(tileCoords))
             {
-                tile.RevealTile(true);
+                tile.RevealTile(true, triggeredByClick);
             }
+        }
+    }
+
+    public void ToggleFlagState()
+    {
+        if (isRevealed) return;
+        hasFlag = !hasFlag;
+
+        if (hasFlag)
+        {
+            flagMarker.enabled = true;
+        }
+        else
+        {
+            flagMarker.enabled = false;
         }
     }
 

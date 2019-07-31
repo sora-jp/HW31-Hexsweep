@@ -5,6 +5,7 @@ using UnityEngine;
 public class GameController : MonoBehaviour
 {
     public static event System.Action OnGameOver;
+    public static event System.Action OnWin;
 
     static GameController _instance;
     public static GameController Instance => _instance;
@@ -24,5 +25,10 @@ public class GameController : MonoBehaviour
     {
         Debug.Log("u ded");
         OnGameOver?.Invoke();
+    }
+
+    public void PlayerWinYeet()
+    {
+        OnWin?.Invoke();
     }
 }
