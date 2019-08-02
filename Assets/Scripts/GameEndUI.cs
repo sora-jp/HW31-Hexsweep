@@ -10,6 +10,7 @@ public class GameEndUI : MonoBehaviour
     public string loseText;
 
     public CanvasGroup container;
+    public CanvasGroup scoreContainer;
     public Image background;
 
     private void Start()
@@ -20,8 +21,26 @@ public class GameEndUI : MonoBehaviour
         container.alpha = 0;
         background.color = Color.clear;
 
+        container.transform.position = GetPosForScreenLow();
+        scoreContainer.transform.position = -GetPosForScreenLow();
+    }
+
+    public void ShowMain()
+    {
+        container.transform.AnimatePosition(Vector3.zero, 0.4f);
+        scoreContainer.transform.AnimatePosition(-GetPosForScreenLow(), 0.4f);
+    }
+
+    public void ShowScores()
+    {
+        container.transform.AnimatePosition(GetPosForScreenLow(), 0.4f);
+        scoreContainer.transform.AnimatePosition(Vector3.zero, 0.4f);
+    }
+
+    Vector3 GetPosForScreenLow()
+    {
         var canvas = GetComponentInParent<Canvas>();
-        container.transform.localPosition = Vector2.down * canvas.pixelRect.height * 0.5f;
+        return Vector2.down * canvas.pixelRect.height * canvas.transform.localScale.x / canvas.scaleFactor;
     }
 
     void OnDestroy()
